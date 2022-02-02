@@ -95,9 +95,14 @@ class Review(models.Model):
         on_delete=models.CASCADE,
         blank=True,
         null=True,
-        verbose_name='Отзыв',
+        verbose_name='Произведение',
         related_name='reviews',
-        help_text='Отзыв к произведению'
+        help_text='Произведение на которое написан отзыв'
+    )
+    pub_date = models.DateTimeField(
+        'Дата публикации отзыва',
+        auto_now_add=True,
+        help_text='Дата публикации отзыва'
     )
 
 
@@ -116,6 +121,10 @@ class Comment(models.Model):
         null=True,
         verbose_name='Отзыв',
         related_name='comments',
-        help_text='Комментарий к отзыву'
+        help_text='Отзыв, к которому написан комментарий'
     )
-
+    pub_date = models.DateTimeField(
+        'Дата публикации комментария',
+        auto_now_add=True,
+        help_text='Дата публикации комментария'
+    )
