@@ -23,9 +23,6 @@ class User(AbstractUser):
     )
 
 
-User = get_user_model()
-
-
 class Category(models.Model):
     name = models.CharField(
         verbose_name='Категория',
