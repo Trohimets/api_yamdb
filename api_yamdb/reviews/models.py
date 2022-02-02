@@ -13,6 +13,7 @@ ROLES = [
     ("admin", ADMIN)
 ]
 
+
 class User(AbstractUser):
     bio = models.TextField(
         blank=True,
@@ -24,27 +25,42 @@ class User(AbstractUser):
     )
 
 
-class Categories(models.Model):
-    name = models.CharField(verbose_name='Категория', max_length=200)
-    slug = models.SlugField(verbose_name='Идентификатор', unique=True)
+class Category(models.Model):
+    name = models.CharField(
+        verbose_name='Категория',
+        max_length=200
+    )
+    slug = models.SlugField(
+        verbose_name='Идентификатор',
+        unique=True
+    )
 
     def __str__(self):
         return {self.name}
 
 
-class Genres(models.Model):
-    name = models.CharField(verbose_name='Жанр', max_length=200)
-    slug = models.SlugField(verbose_name='Идентификатор', unique=True)
+class Genre(models.Model):
+    name = models.CharField(
+        verbose_name='Жанр',
+        max_length=200
+    )
+    slug = models.SlugField(
+        verbose_name='Идентификатор',
+        unique=True
+    )
 
     def __str__(self):
         return {self.name}
 
 
-class Titles(models.Model):
-    name = models.CharField(verbose_name='Название', max_length=200)
+class Title(models.Model):
+    name = models.CharField(
+        verbose_name='Название',
+        max_length=200
+    )
     description = models.TextField(verbose_name='Описание')
     category = models.ForeignKey(
-        Categories,
+        Category,
         on_delete=models.SET_NULL,
         related_name='titles',
         verbose_name='Категория',
@@ -52,7 +68,7 @@ class Titles(models.Model):
         help_text='Выберите категорию'
     )
     genre = models.ForeignKey(
-        Genres,
+        Genre,
         on_delete=models.SET_NULL,
         related_name='titles',
         verbose_name='Жанр',
