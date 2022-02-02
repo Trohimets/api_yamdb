@@ -19,4 +19,13 @@ class User(AbstractUser):
         choices=ROLES,
         default=USER
     )
-    
+
+
+class Comment(models.Model):
+    author = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE,
+        related_name='comments',
+        verbose_name='Автор',
+        help_text='Автор комментария'
+    )
