@@ -2,8 +2,6 @@ from django.contrib.auth.models import AbstractUser
 from django.db import models
 from django.contrib.auth import get_user_model
 
-
-User = get_user_model()
 USER = "user"
 MODERATOR = "moderator"
 ADMIN = "admin"
@@ -12,6 +10,7 @@ ROLES = [
     ("moderator", MODERATOR),
     ("admin", ADMIN)
 ]
+
 
 class User(AbstractUser):
     bio = models.TextField(
@@ -22,6 +21,9 @@ class User(AbstractUser):
         choices=ROLES,
         default=USER
     )
+
+
+User = get_user_model()
 
 
 class Category(models.Model):
@@ -90,6 +92,10 @@ class Review(models.Model):
         verbose_name='Автор',
         help_text='Автор отзыва'
     )
+    text = models.TextField(
+        'Текст отзыва',
+        help_text='Введите текст отзыва'
+    )
     title = models.ForeignKey(
         Title,
         on_delete=models.CASCADE,
@@ -113,6 +119,10 @@ class Comment(models.Model):
         related_name='comments',
         verbose_name='Автор',
         help_text='Автор комментария'
+    )
+    text = models.TextField(
+        'Текст комментария',
+        help_text='Введите текст комментария'
     )
     review = models.ForeignKey(
         Review,
