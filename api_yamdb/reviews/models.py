@@ -105,6 +105,7 @@ class Review(models.Model):
     pub_date = models.DateTimeField(
         'Дата публикации отзыва',
         auto_now_add=True,
+        db_index=True,
         help_text='Дата публикации отзыва'
     )
     score = models.IntegerField(
@@ -136,6 +137,7 @@ class Comment(models.Model):
     )
     pub_date = models.DateTimeField(
         'Дата публикации комментария',
+        db_index=True,
         auto_now_add=True,
         help_text='Дата публикации комментария'
     )
