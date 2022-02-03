@@ -107,6 +107,10 @@ class Review(models.Model):
         auto_now_add=True,
         help_text='Дата публикации отзыва'
     )
+    score = models.IntegerField(
+        'Оценка',
+        help_text='Введдите оценку'
+    )
 
 
 class Comment(models.Model):

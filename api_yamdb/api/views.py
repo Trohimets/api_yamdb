@@ -1,11 +1,13 @@
 from django.shortcuts import render
 from rest_framework import viewsets
-from reviews.models import Category
-from reviews.models import Genre
-from reviews.models import Title
-from .serializers import CategorySerializer
-from .serializers import GenreSerializer
-from .serializers import TitleSerializer
+from reviews.models import Category, Genre, Title, Review, Comment
+
+
+from api.serializers import CategorySerializer
+from api.serializers import GenreSerializer
+from api.serializers import TitleSerializer
+from api.serializers import ReviewSerializer
+from api.serializers import CommentSerializer
 
 
 class CategoryViewSet(viewsets.ModelViewSet):
@@ -21,3 +23,13 @@ class GenreViewSet(viewsets.ModelViewSet):
 class TitleViewSet(viewsets.ModelViewSet):
     queryset = Title.objects.all()
     serializer_class = TitleSerializer
+
+
+class ReviewViewSet(viewsets.ModelViewSet):
+    queryset = Review.objects.all()
+    serializer_class = ReviewSerializer
+
+
+class CommentViewSet(viewsets.ModelViewSet):
+    queryset = Comment.objects.all()
+    serializer_class = CommentSerializer
