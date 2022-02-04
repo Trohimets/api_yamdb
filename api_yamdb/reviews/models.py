@@ -10,6 +10,7 @@ ROLES = [
     ("admin", ADMIN)
 ]
 
+
 class User(AbstractUser):
     email = models.EmailField(
         unique=True,
@@ -23,11 +24,14 @@ class User(AbstractUser):
         default=USER
     )
 
+    @property
     def admin(self):
         return self.role == 'admin'
 
+    @property
     def moderator(self):
         return self.role == 'moderator'
 
+    @property
     def user(self):
         return self.role == 'user'

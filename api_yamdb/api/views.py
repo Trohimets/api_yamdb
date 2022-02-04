@@ -20,6 +20,7 @@ MESSAGE = 'Ваш код подтверждения - {}'
 USERNAME_ERROR = 'Имя пользователя не может быть "me"'
 FIELD_ERROR = 'Неуникальное поле. Ошибка - {}'
 
+
 @api_view(['POST'])
 @permission_classes([AllowAny])
 def signup(request):
@@ -34,7 +35,7 @@ def signup(request):
             username=serializer.data['username'],
         )
     except IntegrityError as error:
-            raise ValidationError(FIELD_ERROR.format(error))
+        raise ValidationError(FIELD_ERROR.format(error))
     if created:
         user.save()
     confirmation_code = default_token_generator.make_token(user)
@@ -45,7 +46,6 @@ def signup(request):
         [user.email],
     )
     return Response(serializer.data, status=status.HTTP_200_OK)
-
 
 
 @api_view(['POST'])
@@ -71,8 +71,8 @@ def token(request):
 class UserViewSet(viewsets.ModelViewSet):
     queryset = User.objects.all()
     serializer_class = UserSerializer
+    permission_classes = (IsRoleAdmin,)
     lookup_field = 'username'
-    permission_classes = [IsRoleAdmin]
 
     def perform_create(self, serializer):
         serializer.save()
@@ -86,7 +86,11 @@ class UserViewSet(viewsets.ModelViewSet):
         if request.method == 'GET':
             serializer = UserSerializer(request.user)
             return Response(serializer.data, status=status.HTTP_200_OK)
-        serializer = UserSerializer(request.user, data=request.data, partial=True)
+        serializer = UserSerializer(
+            request.user,
+            data=request.data,
+            partial=True
+        )
         serializer.is_valid(raise_exception=True)
         serializer.save(role=request.user.role)
         return Response(serializer.data, status=status.HTTP_200_OK)
