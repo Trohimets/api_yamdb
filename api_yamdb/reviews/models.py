@@ -11,6 +11,9 @@ ROLES = [
 ]
 
 class User(AbstractUser):
+    email = models.EmailField(
+        unique=True,
+    )
     bio = models.TextField(
         blank=True,
     )
@@ -19,4 +22,12 @@ class User(AbstractUser):
         choices=ROLES,
         default=USER
     )
-    
+
+    def admin(self):
+        return self.role == 'admin'
+
+    def moderator(self):
+        return self.role == 'moderator'
+
+    def user(self):
+        return self.role == 'user'
