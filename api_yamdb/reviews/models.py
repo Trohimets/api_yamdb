@@ -1,6 +1,6 @@
 from django.contrib.auth.models import AbstractUser
 from django.db import models
-from django.contrib.auth import get_user_model
+
 
 USER = "user"
 MODERATOR = "moderator"
@@ -73,7 +73,7 @@ class Title(models.Model):
         blank=True, null=True,
         help_text='Выберите жанр'
     )
-    year = models.DateTimeField(
+    year = models.IntegerField(
         verbose_name='Год'
     )
 
