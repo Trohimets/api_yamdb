@@ -2,6 +2,7 @@ from django.contrib import admin
 from reviews.models import User, Title, Genre
 from reviews.models import Category, Review, Comment
 
+
 class TitleAdmin(admin.ModelAdmin):
     list_display = (
         'pk',
@@ -67,3 +68,4 @@ admin.site.register(Genre, GenreAdmin)
 admin.site.register(Category, CategoryAdmin)
 admin.site.register(Review, ReviewAdmin)
 admin.site.register(Comment, CommentAdmin)
+

@@ -13,6 +13,9 @@ ROLES = [
 
 
 class User(AbstractUser):
+    email = models.EmailField(
+        unique=True,
+    )
     bio = models.TextField(
         blank=True,
     )
@@ -22,6 +25,19 @@ class User(AbstractUser):
         default=USER
     )
 
+
+    @property
+    def admin(self):
+        return self.role == 'admin'
+
+    @property
+    def moderator(self):
+        return self.role == 'moderator'
+
+    @property
+    def user(self):
+        return self.role == 'user'
+      
 
 class Category(models.Model):
     name = models.CharField(
@@ -141,3 +157,4 @@ class Comment(models.Model):
         auto_now_add=True,
         help_text='Дата публикации комментария'
     )
+

@@ -1,7 +1,47 @@
 import datetime as dt
+from django.shortcuts import get_object_or_404
+from rest_framework import serializers
 from rest_framework import serializers
 from reviews.models import Title, Genre, Category, Review, Comment
-from django.shortcuts import get_object_or_404
+from reviews.models import User
+
+
+class UserSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = User
+        fields = (
+            'first_name',
+            'last_name',
+            'username',
+            'bio',
+            'email',
+            'role',
+        )
+
+
+class SignupSerializer(serializers.Serializer):
+    email = serializers.EmailField(required=True)
+    username = serializers.CharField(
+        max_length=100,
+        required=True,
+    )
+
+    class Meta:
+        model = User
+        fields = ('email', 'username',)
+
+
+class TokenSerializer(serializers.Serializer):
+    username = serializers.CharField(
+        max_length=150,
+        required=True,
+    )
+    confirmation_code = serializers.CharField(required=True)
+
+    class Meta:
+        model = User
+        fields = ('username', 'confirmation_code',)
 
 
 class GenreSerializer(serializers.ModelSerializer):
@@ -38,6 +78,7 @@ class TitleSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError('Год не может быть больше текущего!')
         return value
 
+      
 class CategorySerializer(serializers.ModelSerializer):
     slug = serializers.SlugRelatedField(
         queryset=Category.objects.all(),
