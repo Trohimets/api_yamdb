@@ -1,6 +1,8 @@
+import datetime as dt
 from rest_framework import serializers
 from reviews.models import Title, Genre, Category, Review, Comment
 from django.shortcuts import get_object_or_404
+
 
 class GenreSerializer(serializers.ModelSerializer):
 
@@ -30,8 +32,17 @@ class TitleSerializer(serializers.ModelSerializer):
         title = Title.objects.create(**validated_data, genre=genre)
         return title
 
+    def validate_year(self, value):
+        year = dt.date.today().year
+        if value>year:
+            raise serializers.ValidationError('Год не может быть больше текущего!')
+        return value
 
 class CategorySerializer(serializers.ModelSerializer):
+    slug = serializers.SlugRelatedField(
+        queryset=Category.objects.all(),
+        slug_field='slug'
+    )
 
     class Meta:
         model = Category
