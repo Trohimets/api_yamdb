@@ -2,6 +2,7 @@ from django.contrib import admin
 from reviews.models import User, Title, Genre
 from reviews.models import Category, Review, Comment
 
+
 class TitleAdmin(admin.ModelAdmin):
     list_display = (
         'pk',
@@ -42,7 +43,7 @@ class ReviewAdmin(admin.ModelAdmin):
         'pk',
         'title',
         'author',
-        'pub_date', 
+        'pub_date',
         'score'
     )
     search_fields = ('title', 'author')
@@ -60,6 +61,7 @@ class CommentAdmin(admin.ModelAdmin):
     search_fields = ('title', 'author')
     list_filter = ('review', 'author', 'pub_date')
     empty_value_display = '-пусто-'
+
 
 admin.site.register(User)
 admin.site.register(Title, TitleAdmin)

@@ -1,6 +1,5 @@
 from django.contrib.auth.models import AbstractUser
 from django.db import models
-from django.contrib.auth import get_user_model
 
 USER = "user"
 MODERATOR = "moderator"
@@ -13,6 +12,9 @@ ROLES = [
 
 
 class User(AbstractUser):
+    email = models.EmailField(
+        unique=True,
+    )
     bio = models.TextField(
         blank=True,
     )
@@ -21,6 +23,18 @@ class User(AbstractUser):
         choices=ROLES,
         default=USER
     )
+
+    @property
+    def admin(self):
+        return self.role == 'admin'
+
+    @property
+    def moderator(self):
+        return self.role == 'moderator'
+
+    @property
+    def user(self):
+        return self.role == 'user'
 
 
 class Category(models.Model):
