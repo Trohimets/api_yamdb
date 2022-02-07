@@ -25,7 +25,6 @@ class User(AbstractUser):
         default=USER
     )
 
-
     @property
     def admin(self):
         return self.role == 'admin'
@@ -37,7 +36,7 @@ class User(AbstractUser):
     @property
     def user(self):
         return self.role == 'user'
-      
+
 
 class Category(models.Model):
     name = models.CharField(
@@ -50,7 +49,7 @@ class Category(models.Model):
     )
 
     def __str__(self):
-        return {self.name}
+        return self.name
 
 
 class Genre(models.Model):
@@ -64,7 +63,7 @@ class Genre(models.Model):
     )
 
     def __str__(self):
-        return {self.name}
+        return self.name
 
 
 class Title(models.Model):
@@ -81,12 +80,10 @@ class Title(models.Model):
         blank=True, null=True,
         help_text='Выберите категорию'
     )
-    genre = models.ForeignKey(
+    genre = models.ManyToManyField(
         Genre,
-        on_delete=models.SET_NULL,
         related_name='titles',
         verbose_name='Жанр',
-        blank=True, null=True,
         help_text='Выберите жанр'
     )
     year = models.IntegerField(
@@ -94,7 +91,7 @@ class Title(models.Model):
     )
 
     def __str__(self):
-        return {self.name}
+        return self.name
 
 
 class Review(models.Model):
@@ -157,4 +154,3 @@ class Comment(models.Model):
         auto_now_add=True,
         help_text='Дата публикации комментария'
     )
-

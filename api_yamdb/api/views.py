@@ -6,13 +6,13 @@ from django.shortcuts import get_object_or_404
 from rest_framework import status, viewsets
 from rest_framework.decorators import action, api_view, permission_classes
 from rest_framework.exceptions import ValidationError
-from rest_framework.permissions import AllowAny, IsAuthenticated
+from rest_framework.permissions import AllowAny, IsAuthenticated, IsAdminUser
 from rest_framework.response import Response
 from rest_framework_simplejwt.tokens import AccessToken
 
 from reviews.models import User
 from reviews.models import Category, Genre, Title, Review, Comment
-from .permissions import IsRoleAdmin
+from .permissions import IsRoleAdmin, AdminOrReadOnly
 from .serializers import TokenSerializer, SignupSerializer, UserSerializer
 from api.serializers import CategorySerializer
 from api.serializers import GenreSerializer
@@ -20,8 +20,6 @@ from api.serializers import TitleSerializer
 from api.serializers import ReviewSerializer
 from api.serializers import CommentSerializer
 from api_yamdb.settings import DEFAULT_FROM_EMAIL
-
-
 
 
 SUBJECT = 'YaMDb: код подверждения'
@@ -106,13 +104,14 @@ class UserViewSet(viewsets.ModelViewSet):
 
 
 class CategoryViewSet(viewsets.ViewSet):
-    lookup_field = 'slug'
 
+    @permission_classes([AllowAny])
     def list(self, request):
         queryset = Category.objects.all()
         serializer = CategorySerializer(queryset, many=True)
         return Response(serializer.data)
 
+    @permission_classes([AdminOrReadOnly])
     def create(self, request):
         serializer = CategorySerializer(data=request.data)
         if serializer.is_valid():
@@ -120,12 +119,7 @@ class CategoryViewSet(viewsets.ViewSet):
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-    def retrieve(self, request, pk=None):
-        queryset = Category.objects.all()
-        category = get_object_or_404(queryset, pk=pk)
-        serializer = CategorySerializer(category)
-        return Response(serializer.data)
-
+    @permission_classes([AdminOrReadOnly])
     def destroy(self, request, slug):
         queryset = Category.objects.all()
         category = get_object_or_404(queryset, slug=slug)
@@ -136,6 +130,7 @@ class CategoryViewSet(viewsets.ViewSet):
 class GenreViewSet(viewsets.ModelViewSet):
     queryset = Genre.objects.all()
     serializer_class = GenreSerializer
+    permission_classes = (AdminOrReadOnly,)
 
 
 class TitleViewSet(viewsets.ModelViewSet):
@@ -151,4 +146,3 @@ class ReviewViewSet(viewsets.ModelViewSet):
 class CommentViewSet(viewsets.ModelViewSet):
     queryset = Comment.objects.all()
     serializer_class = CommentSerializer
-

@@ -1,5 +1,4 @@
 import datetime as dt
-from django.shortcuts import get_object_or_404
 from rest_framework import serializers
 from rest_framework import serializers
 from reviews.models import Title, Genre, Category, Review, Comment
@@ -56,7 +55,11 @@ class TitleSerializer(serializers.ModelSerializer):
         queryset=Category.objects.all(),
         slug_field='slug'
     )
-    genre = GenreSerializer(many=True)
+    genre = serializers.SlugRelatedField(
+        many=True,
+        queryset=Genre.objects.all(),
+        slug_field='slug'
+    )
     description = serializers.CharField(required=False)
 
     class Meta:
@@ -64,21 +67,14 @@ class TitleSerializer(serializers.ModelSerializer):
         fields = ('id', 'name', 'description', 'category',
                   'genre', 'year')
 
-    def create(self, validated_data):
-        # Уберем список достижений из словаря validated_data и сохраним его
-        genre = validated_data.pop('genre')
-
-        # Создадим нового котика пока без достижений, данных нам достаточно
-        title = Title.objects.create(**validated_data, genre=genre)
-        return title
 
     def validate_year(self, value):
         year = dt.date.today().year
-        if value>year:
-            raise serializers.ValidationError('Год не может быть больше текущего!')
+        if value > year:
+            raise serializers.ValidationError('Проверьте указанный год')
         return value
 
-      
+
 class CategorySerializer(serializers.ModelSerializer):
     slug = serializers.SlugRelatedField(
         queryset=Category.objects.all(),
