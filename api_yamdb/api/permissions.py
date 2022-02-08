@@ -15,7 +15,8 @@ class IsRoleAdmin(BasePermission):
 class AdminOrReadOnly(permissions.BasePermission):
 
     def has_permission(self, request, view):
+        user = request.user
         return (
             request.method in permissions.SAFE_METHODS
-            or request.user.has_perm('reviews.delete_genre')
+            or user.admin or user.is_superuser
         )
