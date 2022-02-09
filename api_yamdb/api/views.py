@@ -13,7 +13,7 @@ from django_filters.rest_framework import DjangoFilterBackend
 
 from reviews.models import User
 from reviews.models import Category, Genre, Title, Review, Comment
-from .permissions import IsRoleAdmin, AdminOrReadOnly, UserOrNot, ReadOnly
+from .permissions import IsRoleAdmin, AdminOrReadOnly, UserOrNot
 from .serializers import (CategorySerializer, GenreSerializer,
                           TitleGetSerializer, TitlePostSerializer,
                           ReviewSerializer, CommentSerializer, TokenSerializer,
@@ -142,11 +142,6 @@ class ReviewViewSet(viewsets.ModelViewSet):
 
     def perform_create(self, serializer):
         serializer.save(author=self.request.user)
-    
-    def get_permissions(self):
-        if self.action == 'retrieve':
-            return (ReadOnly(),)
-        return super().get_permissions() 
 
 
 class CommentViewSet(viewsets.ModelViewSet):
@@ -159,8 +154,3 @@ class CommentViewSet(viewsets.ModelViewSet):
 
     def perform_create(self, serializer):
         serializer.save(author=self.request.user)
-    
-    def get_permissions(self):
-        if self.action == 'retrieve':
-            return (ReadOnly(),)
-        return super().get_permissions()

@@ -100,13 +100,13 @@ class ReviewSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Review
-        fields = ('id', 'author', 'title', 'text', 'pub_date', 'score')
-        validators = (
+        fields = ('id', 'author', 'text', 'score', 'pub_date')
+        """validators = [
             validators.UniqueTogetherValidator(
                 queryset=Review.objects.all(),
                 fields=('title', 'author'),
-            ),
-        )
+            )
+        ]"""
     
     def validate_score(self, score):
         if score not in range(1, 10):
@@ -121,4 +121,4 @@ class CommentSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Comment
-        fields = ('id', 'author', 'review', 'text', 'pub_date')
+        fields = ('id', 'text', 'author', 'pub_date')

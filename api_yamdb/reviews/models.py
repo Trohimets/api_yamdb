@@ -125,6 +125,14 @@ class Review(models.Model):
         help_text='Введдите оценку'
     )
 
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(
+                fields=['author', 'title'],
+                name='only_one_review'
+            )
+        ]
+
 
 class Comment(models.Model):
     author = models.ForeignKey(
