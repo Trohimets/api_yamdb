@@ -1,41 +1,8 @@
+import datetime as dt
 from rest_framework import serializers
-from reviews.models import Title, Genre, Category, Review, Comment, User
-
-
-class TitleSerializer(serializers.ModelSerializer):
-
-    class Meta:
-        model = Title
-        fields = ('id', 'name', 'description', 'category',
-                  'genre', 'year')
-
-
-class GenreSerializer(serializers.ModelSerializer):
-
-    class Meta:
-        model = Genre
-        fields = ('name', 'id', 'slug')
-
-
-class CategorySerializer(serializers.ModelSerializer):
-
-    class Meta:
-        model = Category
-        fields = ('name', 'id', 'slug')
-
-
-class ReviewSerializer(serializers.ModelSerializer):
-
-    class Meta:
-        model = Review
-        fields = ('id', 'author', 'title', 'text', 'pub_date', 'score')
-
-
-class CommentSerializer(serializers.ModelSerializer):
-
-    class Meta:
-        model = Comment
-        fields = ('id', 'author', 'review', 'text', 'pub_date')
+from rest_framework import serializers
+from reviews.models import Title, Genre, Category, Review, Comment
+from reviews.models import User
 
 
 class UserSerializer(serializers.ModelSerializer):
@@ -74,3 +41,57 @@ class TokenSerializer(serializers.Serializer):
     class Meta:
         model = User
         fields = ('username', 'confirmation_code',)
+
+
+class GenreSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = Genre
+        fields = ('name', 'slug')
+        lookup_field = 'slug'
+
+
+class TitleSerializer(serializers.ModelSerializer):
+    category = serializers.SlugRelatedField(
+        queryset=Category.objects.all(),
+        slug_field='slug'
+    )
+    genre = serializers.SlugRelatedField(
+        many=True,
+        queryset=Genre.objects.all(),
+        slug_field='slug'
+    )
+    description = serializers.CharField(required=False)
+
+    class Meta:
+        model = Title
+        fields = ('id', 'name', 'description', 'category',
+                  'genre', 'year')
+
+    def validate_year(self, value):
+        year = dt.date.today().year
+        if value > year:
+            raise serializers.ValidationError('Проверьте указанный год')
+        return value
+
+
+class CategorySerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = Category
+        fields = ('name', 'slug')
+        lookup_field = 'slug'
+
+
+class ReviewSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = Review
+        fields = ('id', 'author', 'title', 'text', 'pub_date', 'score')
+
+
+class CommentSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = Comment
+        fields = ('id', 'author', 'review', 'text', 'pub_date')

@@ -48,7 +48,7 @@ class Category(models.Model):
     )
 
     def __str__(self):
-        return {self.name}
+        return self.name
 
 
 class Genre(models.Model):
@@ -62,7 +62,7 @@ class Genre(models.Model):
     )
 
     def __str__(self):
-        return {self.name}
+        return self.name
 
 
 class Title(models.Model):
@@ -79,20 +79,18 @@ class Title(models.Model):
         blank=True, null=True,
         help_text='Выберите категорию'
     )
-    genre = models.ForeignKey(
+    genre = models.ManyToManyField(
         Genre,
-        on_delete=models.SET_NULL,
         related_name='titles',
         verbose_name='Жанр',
-        blank=True, null=True,
         help_text='Выберите жанр'
     )
-    year = models.DateTimeField(
+    year = models.IntegerField(
         verbose_name='Год'
     )
 
     def __str__(self):
-        return {self.name}
+        return self.name
 
 
 class Review(models.Model):
