@@ -9,16 +9,11 @@ from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework_simplejwt.tokens import AccessToken
 
-from reviews.models import Category, Genre, Title, Review, Comment, User
-
-
-from api.serializers import CategorySerializer
-from api.serializers import GenreSerializer
-from api.serializers import TitleSerializer
-from api.serializers import ReviewSerializer
-from api.serializers import CommentSerializer
-from .serializers import TokenSerializer, SignupSerializer, UserSerializer
 from api_yamdb.settings import DEFAULT_FROM_EMAIL
+from reviews.models import Category, Genre, Title, Review, Comment, User
+from .serializers import (CategorySerializer, GenreSerializer, TitleSerializer,
+                          ReviewSerializer, CommentSerializer, TokenSerializer,
+                          SignupSerializer, UserSerializer)
 from .permissions import IsRoleAdmin
 
 SUBJECT = 'YaMDb: код подверждения'

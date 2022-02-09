@@ -135,4 +135,4 @@ SIMPLE_JWT = {
 DEFAULT_FROM_EMAIL = 'admin@yambd.com'
 
 EMAIL_BACKEND = 'django.core.mail.backends.filebased.EmailBackend'
-EMAIL_FILE_PATH = os.path.join(BASE_DIR, 'api_yamdb/emailfolder')
+EMAIL_FILE_PATH = os.path.join(BASE_DIR, 'api_yamdb/sended_emails')
