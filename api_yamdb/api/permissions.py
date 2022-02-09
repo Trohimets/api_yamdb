@@ -18,5 +18,5 @@ class AdminOrReadOnly(permissions.BasePermission):
         user = request.user
         return (
             request.method in permissions.SAFE_METHODS
-            or user.is_admin or user.is_superuser
+            or user.is_authenticated and user.is_admin or user.is_superuser
         )
