@@ -14,7 +14,8 @@ from django_filters.rest_framework import DjangoFilterBackend
 from reviews.models import User
 from reviews.models import Category, Genre, Title, Review, Comment
 from .permissions import IsRoleAdmin, AdminOrReadOnly
-from .serializers import (CategorySerializer, GenreSerializer, TitleSerializer,
+from .serializers import (CategorySerializer, GenreSerializer,
+                          TitleGetSerializer, TitlePostSerializer,
                           ReviewSerializer, CommentSerializer, TokenSerializer,
                           SignupSerializer, UserSerializer)
 from api_yamdb.settings import DEFAULT_FROM_EMAIL
@@ -121,9 +122,13 @@ class GenreViewSet(viewsets.ModelViewSet):
 
 class TitleViewSet(viewsets.ModelViewSet):
     queryset = Title.objects.all()
-    serializer_class = TitleSerializer
     filter_backends = (DjangoFilterBackend,)
     filterset_fields = ('category', 'genre', 'name', 'year')
+
+    def get_serializer_class(self):
+        if self.action == 'list' or 'retrieve':
+            return TitleGetSerializer
+        return TitlePostSerializer
 
 
 class ReviewViewSet(viewsets.ModelViewSet):

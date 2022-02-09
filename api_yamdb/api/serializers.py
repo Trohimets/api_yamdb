@@ -51,7 +51,26 @@ class GenreSerializer(serializers.ModelSerializer):
         lookup_field = 'slug'
 
 
-class TitleSerializer(serializers.ModelSerializer):
+class CategorySerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = Category
+        fields = ('name', 'slug')
+        lookup_field = 'slug'
+
+
+class TitleGetSerializer(serializers.ModelSerializer):
+    category = CategorySerializer(read_only=True)
+    genre = GenreSerializer(read_only=True, many=True)
+    description = serializers.CharField(required=False)
+
+    class Meta:
+        model = Title
+        fields = ('id', 'name', 'description', 'category',
+                  'genre', 'year')
+
+
+class TitlePostSerializer(serializers.ModelSerializer):
     category = serializers.SlugRelatedField(
         queryset=Category.objects.all(),
         slug_field='slug'
@@ -73,14 +92,6 @@ class TitleSerializer(serializers.ModelSerializer):
         if value > year:
             raise serializers.ValidationError('Проверьте указанный год')
         return value
-
-
-class CategorySerializer(serializers.ModelSerializer):
-
-    class Meta:
-        model = Category
-        fields = ('name', 'slug')
-        lookup_field = 'slug'
 
 
 class ReviewSerializer(serializers.ModelSerializer):
