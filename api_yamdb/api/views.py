@@ -124,9 +124,10 @@ class TitleViewSet(viewsets.ModelViewSet):
     queryset = Title.objects.all()
     filter_backends = (DjangoFilterBackend,)
     filterset_fields = ('category', 'genre', 'name', 'year')
+    permission_classes = (AdminOrReadOnly,)
 
     def get_serializer_class(self):
-        if self.action == 'list' or 'retrieve':
+        if self.action == 'list' or self.action == 'retrieve':
             return TitleGetSerializer
         return TitlePostSerializer
 
