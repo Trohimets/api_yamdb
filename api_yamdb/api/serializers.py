@@ -1,6 +1,5 @@
 import datetime as dt
-from rest_framework import serializers
-from rest_framework import serializers
+from rest_framework import serializers, validators
 from reviews.models import Title, Genre, Category, Review, Comment
 from reviews.models import User
 
@@ -95,13 +94,30 @@ class TitlePostSerializer(serializers.ModelSerializer):
 
 
 class ReviewSerializer(serializers.ModelSerializer):
+    author = serializers.SlugRelatedField(
+        read_only=True, slug_field='username'
+    )
 
     class Meta:
         model = Review
         fields = ('id', 'author', 'title', 'text', 'pub_date', 'score')
+        validators = (
+            validators.UniqueTogetherValidator(
+                queryset=Review.objects.all(),
+                fields=('title', 'author'),
+            ),
+        )
+    
+    def validate_score(self, score):
+        if score not in range(1, 10):
+            raise serializers.ValidationError('Укажите оценку от 1 до 10')
+        return score
 
 
 class CommentSerializer(serializers.ModelSerializer):
+    author = serializers.SlugRelatedField(
+        read_only=True, slug_field='username'
+    )
 
     class Meta:
         model = Comment
