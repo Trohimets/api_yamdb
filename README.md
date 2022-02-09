@@ -51,3 +51,7 @@ python manage.py migrate
 ```
 python manage.py runserver
 ```
+
+## Документация к API
+документация к API доступна после запуска проекта по ссылке:
+http://127.0.0.1/redoc/
