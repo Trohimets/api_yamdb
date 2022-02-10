@@ -2,6 +2,7 @@ from django.contrib.auth.tokens import default_token_generator
 from django.core.mail import send_mail
 from django.db import IntegrityError
 from django.shortcuts import get_object_or_404
+from django.db.models import Avg
 
 from rest_framework import status, viewsets, filters, mixins
 from rest_framework.decorators import action, api_view, permission_classes
@@ -136,6 +137,7 @@ class TitleViewSet(viewsets.ModelViewSet):
     filterset_fields = ('category', 'genre', 'name', 'year')
     ordering_fields = ('name', 'year', 'id') 
     permission_classes = (AdminOrReadOnly,)
+    #rating = Title.objects.annotate(Avg('reviews.score'))
 
     def get_serializer_class(self):
         if self.action == 'list' or self.action == 'retrieve':
@@ -157,11 +159,6 @@ class ReviewViewSet(viewsets.ModelViewSet):
             title=get_object_or_404(Title, pk=self.kwargs.get("title_id"))
         )
     
-    def perform_update(self, serializer):
-        serializer.save(
-            author=self.request.user, 
-            title=get_object_or_404(Title, pk=self.kwargs.get("title_id"))
-        )
 
 
 class CommentViewSet(viewsets.ModelViewSet):
