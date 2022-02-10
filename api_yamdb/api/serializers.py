@@ -68,11 +68,15 @@ class TitleGetSerializer(serializers.ModelSerializer):
         slug_field='slug'
     )
     description = serializers.CharField(required=False)
+    rating = serializers.SerializerMethodField()
+
+    def get_rating(self, obj):
+        return obj.rating
 
     class Meta:
         model = Title
         fields = ('id', 'name', 'description', 'category',
-                  'genre', 'year')
+                  'genre', 'year', 'rating')
 
 
 class TitlePostSerializer(serializers.ModelSerializer):
