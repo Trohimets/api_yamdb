@@ -1,4 +1,6 @@
 import datetime as dt
+from urllib import request
+from django.shortcuts import get_object_or_404
 from rest_framework import serializers, validators
 from reviews.models import Title, Genre, Category, Review, Comment
 from reviews.models import User
@@ -101,19 +103,27 @@ class ReviewSerializer(serializers.ModelSerializer):
     author = serializers.SlugRelatedField(
         read_only=True, slug_field='username'
     )
-    title = serializers.SlugRelatedField(
-        read_only=True, slug_field='id'
-    )
+    """title = serializers.PrimaryKeyRelatedField(
+        queryset=Title.objects.all())"""
 
     class Meta:
         model = Review
-        fields = ('id', 'author', 'text', 'title', 'score', 'pub_date')
+        fields = ('id', 'author', 'text', 'score', 'pub_date')
         """validators = [
             validators.UniqueTogetherValidator(
                 queryset=Review.objects.all(),
                 fields=('title', 'author'),
             )
         ]"""
+
+    """def validate(self, data):
+        title=get_object_or_404(Title, pk=self.context['request'].title_id)
+        authors=list(title.reviews.values_list('author', flat=True))
+        if self.context['request'].user in authors:
+            raise serializers.ValidationError(
+                'Можно оставить только один отзыв на произведение'
+            )
+        return data"""
     
     def validate_score(self, score):
         if score not in range(1, 10):
