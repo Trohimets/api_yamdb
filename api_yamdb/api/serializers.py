@@ -103,27 +103,20 @@ class ReviewSerializer(serializers.ModelSerializer):
     author = serializers.SlugRelatedField(
         read_only=True, slug_field='username'
     )
-    """title = serializers.PrimaryKeyRelatedField(
-        queryset=Title.objects.all())"""
 
     class Meta:
         model = Review
         fields = ('id', 'author', 'text', 'score', 'pub_date')
-        """validators = [
-            validators.UniqueTogetherValidator(
-                queryset=Review.objects.all(),
-                fields=('title', 'author'),
-            )
-        ]"""
 
-    """def validate(self, data):
-        title=get_object_or_404(Title, pk=self.context['request'].title_id)
-        authors=list(title.reviews.values_list('author', flat=True))
-        if self.context['request'].user in authors:
-            raise serializers.ValidationError(
-                'Можно оставить только один отзыв на произведение'
-            )
-        return data"""
+    def validate(self, data):
+        title_id = self.context['view'].kwargs.get('title_id')
+        user = self.context['request'].user
+        if self.context['request'].method == 'POST':
+            if Review.objects.filter(title=title_id, author=user).exists():
+                raise serializers.ValidationError(
+                    'Можно оставить только один отзыв на произведение'
+                )
+        return data
     
     def validate_score(self, score):
         if score not in range(1, 10):
