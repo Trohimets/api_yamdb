@@ -3,7 +3,7 @@ from django.core.mail import send_mail
 from django.db import IntegrityError
 from django.shortcuts import get_object_or_404
 
-from rest_framework import status, viewsets, filters
+from rest_framework import status, viewsets, filters, mixins
 from rest_framework.decorators import action, api_view, permission_classes
 from rest_framework.exceptions import ValidationError
 from rest_framework.permissions import AllowAny, IsAuthenticated
@@ -13,7 +13,7 @@ from django_filters.rest_framework import DjangoFilterBackend
 
 from reviews.models import User
 from reviews.models import Category, Genre, Title, Review, Comment
-from .permissions import IsRoleAdmin, AdminOrReadOnly, UserOrNot
+from .permissions import IsRoleAdmin, AdminOrReadOnly, UserOrNot, DeleteOnly
 from .serializers import (CategorySerializer, GenreSerializer,
                           TitleGetSerializer, TitlePostSerializer,
                           ReviewSerializer, CommentSerializer, TokenSerializer,
@@ -102,7 +102,12 @@ class UserViewSet(viewsets.ModelViewSet):
         return Response(serializer.data, status=status.HTTP_200_OK)
 
 
-class CategoryViewSet(viewsets.ModelViewSet):
+class CreateListDestroyViewSet(mixins.CreateModelMixin, mixins.DestroyModelMixin,
+                          mixins.ListModelMixin, viewsets.GenericViewSet):
+    pass
+
+
+class CategoryViewSet(CreateListDestroyViewSet):
     queryset = Category.objects.all()
     serializer_class = CategorySerializer
     permission_classes = (AdminOrReadOnly,)
@@ -111,13 +116,18 @@ class CategoryViewSet(viewsets.ModelViewSet):
     search_fields = ('name',)
 
 
-class GenreViewSet(viewsets.ModelViewSet):
+class GenreViewSet(CreateListDestroyViewSet):
     queryset = Genre.objects.all()
     serializer_class = GenreSerializer
     permission_classes = (AdminOrReadOnly,)
     lookup_field = 'slug'
     filter_backends = (filters.SearchFilter,)
     search_fields = ('name',)
+
+    def get_permissions(self):
+        if self.action == 'retrieve':
+            return (DeleteOnly(),)
+        return super().get_permissions()
 
 
 class TitleViewSet(viewsets.ModelViewSet):
