@@ -1,7 +1,5 @@
 import datetime as dt
-from urllib import request
-from django.shortcuts import get_object_or_404
-from rest_framework import serializers, validators
+from rest_framework import serializers
 from reviews.models import Title, Genre, Category, Review, Comment
 from reviews.models import User
 
@@ -121,7 +119,7 @@ class ReviewSerializer(serializers.ModelSerializer):
                     'Можно оставить только один отзыв на произведение'
                 )
         return data
-    
+
     def validate_score(self, score):
         if score not in range(1, 11):
             raise serializers.ValidationError('Укажите оценку от 1 до 10')

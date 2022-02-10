@@ -13,7 +13,7 @@ from rest_framework_simplejwt.tokens import AccessToken
 from django_filters.rest_framework import DjangoFilterBackend
 
 from reviews.models import User
-from reviews.models import Category, Genre, Title, Review, Comment
+from reviews.models import Category, Genre, Title, Review
 from .permissions import IsRoleAdmin, AdminOrReadOnly, UserOrNot
 from .serializers import (CategorySerializer, GenreSerializer,
                           TitleGetSerializer, TitlePostSerializer,
@@ -132,12 +132,11 @@ class GenreViewSet(CreateListDestroyViewSet):
 
 
 class TitleViewSet(viewsets.ModelViewSet):
-    #queryset = Title.objects.all()
     filter_backends = (DjangoFilterBackend, filters.OrderingFilter)
     filterset_fields = ('category', 'genre', 'name', 'year')
-    ordering_fields = ('name', 'year', 'id') 
+    ordering_fields = ('name', 'year', 'id')
     permission_classes = (AdminOrReadOnly,)
-    
+
     def get_serializer_class(self):
         if self.action == 'list' or self.action == 'retrieve':
             return TitleGetSerializer
@@ -158,10 +157,9 @@ class ReviewViewSet(viewsets.ModelViewSet):
 
     def perform_create(self, serializer):
         serializer.save(
-            author=self.request.user, 
+            author=self.request.user,
             title=get_object_or_404(Title, pk=self.kwargs.get("title_id"))
         )
-    
 
 
 class CommentViewSet(viewsets.ModelViewSet):
@@ -175,4 +173,4 @@ class CommentViewSet(viewsets.ModelViewSet):
     def perform_create(self, serializer):
         serializer.save(
             author=self.request.user,
-            review = get_object_or_404(Review, pk=self.kwargs.get("review_id")))
+            review=get_object_or_404(Review, pk=self.kwargs.get("review_id")))
