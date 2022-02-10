@@ -22,12 +22,6 @@ class AdminOrReadOnly(permissions.BasePermission):
         )
 
 
-class DeleteOnly(permissions.BasePermission):
-    
-    def has_permission(self, request, view):
-        return False
-
-
 class UserOrNot(permissions.BasePermission):
 
     def has_object_permission(self, request, view, obj):

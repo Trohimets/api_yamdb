@@ -13,7 +13,7 @@ from django_filters.rest_framework import DjangoFilterBackend
 
 from reviews.models import User
 from reviews.models import Category, Genre, Title, Review, Comment
-from .permissions import IsRoleAdmin, AdminOrReadOnly, UserOrNot, DeleteOnly
+from .permissions import IsRoleAdmin, AdminOrReadOnly, UserOrNot
 from .serializers import (CategorySerializer, GenreSerializer,
                           TitleGetSerializer, TitlePostSerializer,
                           ReviewSerializer, CommentSerializer, TokenSerializer,
@@ -132,8 +132,9 @@ class GenreViewSet(CreateListDestroyViewSet):
 
 class TitleViewSet(viewsets.ModelViewSet):
     queryset = Title.objects.all()
-    filter_backends = (DjangoFilterBackend,)
+    filter_backends = (DjangoFilterBackend, filters.OrderingFilter)
     filterset_fields = ('category', 'genre', 'name', 'year')
+    ordering_fields = ('name', 'year', 'id') 
     permission_classes = (AdminOrReadOnly,)
 
     def get_serializer_class(self):
