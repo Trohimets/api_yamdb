@@ -10,7 +10,6 @@ from rest_framework.exceptions import ValidationError
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework_simplejwt.tokens import AccessToken
-from django_filters.rest_framework import DjangoFilterBackend
 
 from reviews.models import User
 from reviews.models import Category, Genre, Title, Review
@@ -20,7 +19,7 @@ from .serializers import (CategorySerializer, GenreSerializer,
                           ReviewSerializer, CommentSerializer, TokenSerializer,
                           SignupSerializer, UserSerializer)
 from api_yamdb.settings import DEFAULT_FROM_EMAIL
-
+from api.filters import TitleFilter
 
 SUBJECT = 'YaMDb: код подверждения'
 MESSAGE = 'Ваш код подтверждения - {}'
@@ -125,15 +124,9 @@ class GenreViewSet(CreateListDestroyViewSet):
     filter_backends = (filters.SearchFilter,)
     search_fields = ('name',)
 
-    def get_permissions(self):
-        if self.action == 'retrieve':
-            return (DeleteOnly(),)
-        return super().get_permissions()
-
 
 class TitleViewSet(viewsets.ModelViewSet):
-    filter_backends = (DjangoFilterBackend, filters.OrderingFilter)
-    filterset_fields = ('category', 'genre', 'name', 'year')
+    filter_backends = (TitleFilter, filters.OrderingFilter)
     ordering_fields = ('name', 'year', 'id')
     permission_classes = (AdminOrReadOnly,)
 
