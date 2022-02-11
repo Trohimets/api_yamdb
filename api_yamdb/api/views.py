@@ -102,8 +102,10 @@ class UserViewSet(viewsets.ModelViewSet):
         return Response(serializer.data, status=status.HTTP_200_OK)
 
 
-class CreateListDestroyViewSet(mixins.CreateModelMixin, mixins.DestroyModelMixin,
-                          mixins.ListModelMixin, viewsets.GenericViewSet):
+class CreateListDestroyViewSet(mixins.CreateModelMixin,
+                               mixins.DestroyModelMixin,
+                               mixins.ListModelMixin,
+                               viewsets.GenericViewSet):
     pass
 
 
@@ -126,7 +128,8 @@ class GenreViewSet(CreateListDestroyViewSet):
 
 
 class TitleViewSet(viewsets.ModelViewSet):
-    filter_backends = (TitleFilter, filters.OrderingFilter)
+    filterset_class = TitleFilter
+    filter_backends = (filters.OrderingFilter,)
     ordering_fields = ('name', 'year', 'id')
     permission_classes = (AdminOrReadOnly,)
 
