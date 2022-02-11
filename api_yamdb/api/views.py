@@ -10,7 +10,6 @@ from rest_framework.exceptions import ValidationError
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework_simplejwt.tokens import AccessToken
-from django_filters.rest_framework import DjangoFilterBackend
 
 from reviews.models import User
 from reviews.models import Category, Genre, Title, Review
@@ -20,6 +19,7 @@ from .serializers import (CategorySerializer, GenreSerializer,
                           ReviewSerializer, CommentSerializer, TokenSerializer,
                           SignupSerializer, UserSerializer)
 from api_yamdb.settings import DEFAULT_FROM_EMAIL
+from .filter import TitleFilter
 
 
 SUBJECT = 'YaMDb: код подверждения'
@@ -103,8 +103,10 @@ class UserViewSet(viewsets.ModelViewSet):
         return Response(serializer.data, status=status.HTTP_200_OK)
 
 
-class CreateListDestroyViewSet(mixins.CreateModelMixin, mixins.DestroyModelMixin,
-                          mixins.ListModelMixin, viewsets.GenericViewSet):
+class CreateListDestroyViewSet(mixins.CreateModelMixin,
+                               mixins.DestroyModelMixin,
+                               mixins.ListModelMixin,
+                               viewsets.GenericViewSet):
     pass
 
 
@@ -132,10 +134,10 @@ class GenreViewSet(CreateListDestroyViewSet):
 
 
 class TitleViewSet(viewsets.ModelViewSet):
-    filter_backends = (DjangoFilterBackend, filters.OrderingFilter)
     filterset_fields = ('category', 'genre', 'name', 'year')
     ordering_fields = ('name', 'year', 'id')
     permission_classes = (AdminOrReadOnly,)
+    filterset_class = TitleFilter
 
     def get_serializer_class(self):
         if self.action == 'list' or self.action == 'retrieve':
