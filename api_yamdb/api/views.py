@@ -19,7 +19,7 @@ from .serializers import (CategorySerializer, GenreSerializer,
                           ReviewSerializer, CommentSerializer, TokenSerializer,
                           SignupSerializer, UserSerializer)
 from api_yamdb.settings import DEFAULT_FROM_EMAIL
-from .filter import TitleFilter
+from .filters import TitleFilter
 
 
 SUBJECT = 'YaMDb: код подверждения'
