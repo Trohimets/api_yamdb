@@ -24,7 +24,6 @@ from .filters import TitleFilter
 
 SUBJECT = 'YaMDb: код подверждения'
 MESSAGE = 'Ваш код подтверждения - {}'
-USERNAME_ERROR = 'Имя пользователя не может быть "me"'
 FIELD_ERROR = 'Неуникальное поле. Ошибка - {}'
 
 
@@ -34,8 +33,6 @@ def signup(request):
     serializer = SignupSerializer(data=request.data)
     serializer.is_valid(raise_exception=True)
     user = serializer.validated_data.get('username')
-    if user == 'me':
-        raise ValidationError(USERNAME_ERROR)
     try:
         user, created = User.objects.get_or_create(
             email=serializer.data['email'],
@@ -43,8 +40,6 @@ def signup(request):
         )
     except IntegrityError as error:
         raise ValidationError(FIELD_ERROR.format(error))
-    if created:
-        user.save()
     confirmation_code = default_token_generator.make_token(user)
     send_mail(
         SUBJECT,

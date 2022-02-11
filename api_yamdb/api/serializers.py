@@ -17,6 +17,13 @@ class UserSerializer(serializers.ModelSerializer):
             'role',
         )
 
+    def validate_username(self, value):
+        if value == 'me':
+            raise serializers.ValidationError(
+                'Имя пользователя не может быть "me"'
+            )
+        return value
+
 
 class SignupSerializer(serializers.Serializer):
     email = serializers.EmailField(required=True)
@@ -28,6 +35,13 @@ class SignupSerializer(serializers.Serializer):
     class Meta:
         model = User
         fields = ('email', 'username',)
+
+    def validate_username(self, value):
+        if value == 'me':
+            raise serializers.ValidationError(
+                'Имя пользователя не может быть "me"'
+            )
+        return value
 
 
 class TokenSerializer(serializers.Serializer):
