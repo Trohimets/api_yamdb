@@ -127,14 +127,8 @@ class GenreViewSet(CreateListDestroyViewSet):
     filter_backends = (filters.SearchFilter,)
     search_fields = ('name',)
 
-    def get_permissions(self):
-        if self.action == 'retrieve':
-            return (DeleteOnly(),)
-        return super().get_permissions()
-
 
 class TitleViewSet(viewsets.ModelViewSet):
-    filterset_fields = ('category', 'genre', 'name', 'year')
     ordering_fields = ('name', 'year', 'id')
     permission_classes = (AdminOrReadOnly,)
     filterset_class = TitleFilter
