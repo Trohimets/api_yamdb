@@ -1,5 +1,8 @@
 from django.contrib.auth.models import AbstractUser
 from django.db import models
+import datetime as dt
+from django.core.exceptions import ValidationError
+
 
 USER = "user"
 MODERATOR = "moderator"
@@ -9,6 +12,13 @@ ROLES = [
     ("moderator", MODERATOR),
     ("admin", ADMIN)
 ]
+
+
+def validate_year(value):
+    year = dt.date.today().year
+    if value > year:
+        raise ValidationError('Проверьте указанный год')
+    return value
 
 
 class User(AbstractUser):
@@ -87,6 +97,7 @@ class Title(models.Model):
         help_text='Выберите жанр'
     )
     year = models.IntegerField(
+        validators=[validate_year],
         verbose_name='Год'
     )
 
