@@ -40,10 +40,11 @@ class User(AbstractUser):
 class Category(models.Model):
     name = models.CharField(
         verbose_name='Категория',
-        max_length=200
+        max_length=256
     )
     slug = models.SlugField(
         verbose_name='Идентификатор',
+        max_length=50,
         unique=True
     )
 

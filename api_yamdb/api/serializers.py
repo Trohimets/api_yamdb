@@ -97,7 +97,6 @@ class TitlePostSerializer(serializers.ModelSerializer):
         queryset=Genre.objects.all(),
         slug_field='slug'
     )
-    description = serializers.CharField(required=False)
 
     class Meta:
         model = Title

@@ -124,7 +124,7 @@ class GenreViewSet(CreateListDestroyViewSet):
 
 
 class TitleViewSet(viewsets.ModelViewSet):
-    ordering_fields = ('name', 'year', 'id')
+    ordering_fields = ('year', 'name')
     permission_classes = (AdminOrReadOnly,)
     filterset_class = TitleFilter
 
