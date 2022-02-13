@@ -126,11 +126,6 @@ class ReviewSerializer(serializers.ModelSerializer):
                 )
         return data
 
-    def validate_score(self, score):
-        if score not in range(1, 11):
-            raise serializers.ValidationError('Укажите оценку от 1 до 10')
-        return score
-
 
 class CommentSerializer(serializers.ModelSerializer):
     author = serializers.SlugRelatedField(
