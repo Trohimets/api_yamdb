@@ -2,6 +2,7 @@ from django.contrib.auth.models import AbstractUser
 from django.db import models
 import datetime as dt
 from django.core.exceptions import ValidationError
+from django.core.validators import MinValueValidator, MaxValueValidator
 
 
 USER = "user"
@@ -134,6 +135,10 @@ class Review(models.Model):
     )
     score = models.IntegerField(
         'Оценка',
+        validators=[
+            MinValueValidator(1), 
+            MaxValueValidator(10)
+        ],
         help_text='Введдите оценку'
     )
 

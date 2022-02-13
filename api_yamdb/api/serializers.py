@@ -113,9 +113,13 @@ class ReviewSerializer(serializers.ModelSerializer):
         fields = ('id', 'author', 'text', 'score', 'pub_date')
 
     def validate(self, data):
-        title_id = self.context['view'].kwargs.get('title_id')
-        user = self.context['request'].user
         if self.context['request'].method == 'POST':
+            title_id = self.context['view'].kwargs.get('title_id')
+            user = self.context['request'].user
+            if not Title.objects.filter(pk=title_id):
+                raise serializers.ValidationError(
+                    'Неверно указан id произведения'
+                )
             if Review.objects.filter(title=title_id, author=user).exists():
                 raise serializers.ValidationError(
                     'Можно оставить только один отзыв на произведение'
