@@ -66,7 +66,7 @@ class Category(models.Model):
 class Genre(models.Model):
     name = models.CharField(
         verbose_name='Жанр',
-        max_length=200
+        max_length=256
     )
     slug = models.SlugField(
         verbose_name='Идентификатор',
@@ -78,9 +78,8 @@ class Genre(models.Model):
 
 
 class Title(models.Model):
-    name = models.CharField(
-        verbose_name='Название',
-        max_length=200
+    name = models.TextField(
+        verbose_name='Название'
     )
     description = models.TextField(verbose_name='Описание')
     category = models.ForeignKey(
