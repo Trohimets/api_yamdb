@@ -107,29 +107,25 @@ class CreateListDestroyViewSet(mixins.CreateModelMixin,
                                mixins.DestroyModelMixin,
                                mixins.ListModelMixin,
                                viewsets.GenericViewSet):
-    pass
+    permission_classes = (AdminOrReadOnly,)
+    lookup_field = 'slug'
+    filter_backends = (filters.SearchFilter,)
+    search_fields = ('name',)
 
 
 class CategoryViewSet(CreateListDestroyViewSet):
     queryset = Category.objects.all()
     serializer_class = CategorySerializer
-    permission_classes = [IsRoleAdminOrStaff | ReadOnly]
-    lookup_field = 'slug'
-    filter_backends = (filters.SearchFilter,)
-    search_fields = ('name',)
 
 
 class GenreViewSet(CreateListDestroyViewSet):
     queryset = Genre.objects.all()
     serializer_class = GenreSerializer
-    permission_classes = [IsRoleAdminOrStaff | ReadOnly]
-    lookup_field = 'slug'
-    filter_backends = (filters.SearchFilter,)
-    search_fields = ('name',)
 
 
 class TitleViewSet(viewsets.ModelViewSet):
-    ordering_fields = ('name', 'year', 'id')
+    queryset = Title.objects.annotate(rating=Avg('reviews__score'))
+    ordering_fields = ('year', 'name')
     permission_classes = [IsRoleAdminOrStaff | ReadOnly]
     filterset_class = TitleFilter
 
@@ -138,35 +134,43 @@ class TitleViewSet(viewsets.ModelViewSet):
             return TitleGetSerializer
         return TitlePostSerializer
 
-    def get_queryset(self):
-        queryset = Title.objects.annotate(rating=Avg('reviews__score'))
-        return queryset
+
+class RecordViewSet(viewsets.ModelViewSet):
+    permission_classes = (UserOrReadOnly,)
+    base_model = None
+    id_name = None
+    record_name = None
+
+    def get_base_record(self):
+        record = get_object_or_404(self.base_model, pk=self.kwargs.get(self.id_name))
+        return record
+
+    def perform_create(self, serializer):
+        print (serializer)
+        kwargs = {
+            "author" : self.request.user,
+            self.record_name : get_object_or_404(self.base_model, pk=self.kwargs.get(self.id_name))
+        }
+        serializer.save(**kwargs)
 
 
-class ReviewViewSet(viewsets.ModelViewSet):
+class ReviewViewSet(RecordViewSet):
     serializer_class = ReviewSerializer
-    permission_classes = (UserOrNot,)
-
+    base_model = Title
+    id_name = "title_id"
+    record_name = "title"
+    
     def get_queryset(self):
-        title = get_object_or_404(Title, pk=self.kwargs.get("title_id"))
+        title = self.get_base_record()
         return title.reviews.all()
 
-    def perform_create(self, serializer):
-        serializer.save(
-            author=self.request.user,
-            title=get_object_or_404(Title, pk=self.kwargs.get("title_id"))
-        )
 
-
-class CommentViewSet(viewsets.ModelViewSet):
+class CommentViewSet(RecordViewSet):
     serializer_class = CommentSerializer
-    permission_classes = (UserOrNot,)
+    base_model = Review
+    id_name = "review_id"
+    record_name = "review"
 
     def get_queryset(self):
-        review = get_object_or_404(Review, pk=self.kwargs.get("review_id"))
+        review = self.get_base_record()
         return review.comments.all()
-
-    def perform_create(self, serializer):
-        serializer.save(
-            author=self.request.user,
-            review=get_object_or_404(Review, pk=self.kwargs.get("review_id")))

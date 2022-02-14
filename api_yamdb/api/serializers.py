@@ -1,4 +1,4 @@
-import datetime as dt
+from django.shortcuts import get_object_or_404
 from rest_framework import serializers
 from reviews.models import Title, Genre, Category, Review, Comment
 from reviews.models import User
@@ -86,6 +86,8 @@ class TitleGetSerializer(serializers.ModelSerializer):
         model = Title
         fields = ('id', 'name', 'description', 'category',
                   'genre', 'year', 'rating')
+        read_only_fields = ('id', 'name', 'description', 'category',
+                            'genre', 'year', 'rating')
 
 
 class TitlePostSerializer(serializers.ModelSerializer):
@@ -98,18 +100,11 @@ class TitlePostSerializer(serializers.ModelSerializer):
         queryset=Genre.objects.all(),
         slug_field='slug'
     )
-    description = serializers.CharField(required=False)
 
     class Meta:
         model = Title
         fields = ('id', 'name', 'description', 'category',
                   'genre', 'year')
-
-    def validate_year(self, value):
-        year = dt.date.today().year
-        if value > year:
-            raise serializers.ValidationError('Проверьте указанный год')
-        return value
 
 
 class ReviewSerializer(serializers.ModelSerializer):
@@ -122,19 +117,15 @@ class ReviewSerializer(serializers.ModelSerializer):
         fields = ('id', 'author', 'text', 'score', 'pub_date')
 
     def validate(self, data):
-        title_id = self.context['view'].kwargs.get('title_id')
-        user = self.context['request'].user
         if self.context['request'].method == 'POST':
-            if Review.objects.filter(title=title_id, author=user).exists():
+            title_id = self.context['view'].kwargs.get('title_id')
+            title = get_object_or_404(Title,  pk=title_id)
+            user = self.context['request'].user
+            if Review.objects.filter(title=title, author=user).exists():
                 raise serializers.ValidationError(
                     'Можно оставить только один отзыв на произведение'
                 )
         return data
-
-    def validate_score(self, score):
-        if score not in range(1, 11):
-            raise serializers.ValidationError('Укажите оценку от 1 до 10')
-        return score
 
 
 class CommentSerializer(serializers.ModelSerializer):

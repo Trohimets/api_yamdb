@@ -1,5 +1,9 @@
 from django.contrib.auth.models import AbstractUser
 from django.db import models
+import datetime as dt
+from django.core.exceptions import ValidationError
+from django.core.validators import MinValueValidator, MaxValueValidator
+
 
 USER = "user"
 MODERATOR = "moderator"
@@ -9,6 +13,13 @@ ROLES = [
     ("moderator", MODERATOR),
     ("admin", ADMIN)
 ]
+
+
+def validate_year(value):
+    year = dt.date.today().year
+    if value > year:
+        raise ValidationError('Проверьте указанный год')
+    return value
 
 
 class User(AbstractUser):
@@ -53,10 +64,11 @@ class User(AbstractUser):
 class Category(models.Model):
     name = models.CharField(
         verbose_name='Категория',
-        max_length=200
+        max_length=256
     )
     slug = models.SlugField(
         verbose_name='Идентификатор',
+        max_length=50,
         unique=True
     )
 
@@ -67,7 +79,7 @@ class Category(models.Model):
 class Genre(models.Model):
     name = models.CharField(
         verbose_name='Жанр',
-        max_length=200
+        max_length=256
     )
     slug = models.SlugField(
         verbose_name='Идентификатор',
@@ -79,9 +91,8 @@ class Genre(models.Model):
 
 
 class Title(models.Model):
-    name = models.CharField(
-        verbose_name='Название',
-        max_length=200
+    name = models.TextField(
+        verbose_name='Название'
     )
     description = models.TextField(verbose_name='Описание')
     category = models.ForeignKey(
@@ -99,6 +110,7 @@ class Title(models.Model):
         help_text='Выберите жанр'
     )
     year = models.IntegerField(
+        validators=[validate_year],
         verbose_name='Год'
     )
 
@@ -135,6 +147,10 @@ class Review(models.Model):
     )
     score = models.IntegerField(
         'Оценка',
+        validators=[
+            MinValueValidator(1), 
+            MaxValueValidator(10)
+        ],
         help_text='Введдите оценку'
     )
 
