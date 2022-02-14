@@ -9,7 +9,6 @@ class TitleAdmin(admin.ModelAdmin):
         'name',
         'description',
         'category',
-        'genre',
         'year'
     )
     list_editable = ('category',)
