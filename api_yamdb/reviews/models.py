@@ -1,6 +1,6 @@
+import datetime as dt
 from django.contrib.auth.models import AbstractUser
 from django.db import models
-import datetime as dt
 from django.core.exceptions import ValidationError
 from django.core.validators import MinValueValidator, MaxValueValidator
 
@@ -23,8 +23,21 @@ def validate_year(value):
 
 
 class User(AbstractUser):
-    email = models.EmailField(
+    username = models.CharField(
+        max_length=150,
         unique=True,
+    )
+    first_name = models.CharField(
+        max_length=150,
+        blank=True
+    )
+    last_name = models.CharField(
+        max_length=150,
+        blank=True
+    )
+    email = models.EmailField(
+        max_length=254,
+        unique=True
     )
     bio = models.TextField(
         blank=True,
@@ -37,7 +50,7 @@ class User(AbstractUser):
 
     @property
     def is_admin(self):
-        return self.role == ADMIN
+        return self.is_superuser or self.role == ADMIN
 
     @property
     def is_moderator(self):
@@ -135,7 +148,7 @@ class Review(models.Model):
     score = models.IntegerField(
         'Оценка',
         validators=[
-            MinValueValidator(1), 
+            MinValueValidator(1),
             MaxValueValidator(10)
         ],
         help_text='Введдите оценку'

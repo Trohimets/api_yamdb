@@ -1,5 +1,6 @@
 from django.shortcuts import get_object_or_404
 from rest_framework import serializers
+
 from reviews.models import Title, Genre, Category, Review, Comment
 from reviews.models import User
 
@@ -26,10 +27,14 @@ class UserSerializer(serializers.ModelSerializer):
 
 
 class SignupSerializer(serializers.Serializer):
-    email = serializers.EmailField(required=True)
-    username = serializers.CharField(
-        max_length=100,
+    email = serializers.EmailField(
+        max_length=254,
+        required=True
+    )
+    username = serializers.RegexField(
+        max_length=150,
         required=True,
+        regex=r'^[\w.@+-]'
     )
 
     class Meta:
@@ -45,9 +50,10 @@ class SignupSerializer(serializers.Serializer):
 
 
 class TokenSerializer(serializers.Serializer):
-    username = serializers.CharField(
+    username = serializers.RegexField(
         max_length=150,
         required=True,
+        regex=r'^[\w.@+-]'
     )
     confirmation_code = serializers.CharField(required=True)
 

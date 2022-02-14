@@ -1,8 +1,10 @@
 from django.contrib.auth.tokens import default_token_generator
 from django.core.mail import send_mail
+from django.contrib.auth.models import update_last_login
 from django.db import IntegrityError
 from django.shortcuts import get_object_or_404
 from django.db.models import Avg
+
 
 from rest_framework import status, viewsets, filters, mixins
 from rest_framework.decorators import action, api_view, permission_classes
@@ -11,15 +13,15 @@ from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework_simplejwt.tokens import AccessToken
 
-from reviews.models import User
-from reviews.models import Category, Genre, Title, Review
-from .permissions import IsRoleAdmin, AdminOrReadOnly, UserOrReadOnly
+from .filters import TitleFilter
+from .permissions import IsRoleAdminOrStaff, UserOrReadOnly, ReadOnly
 from .serializers import (CategorySerializer, GenreSerializer,
                           TitleGetSerializer, TitlePostSerializer,
                           ReviewSerializer, CommentSerializer, TokenSerializer,
                           SignupSerializer, UserSerializer)
 from api_yamdb.settings import DEFAULT_FROM_EMAIL
-from .filters import TitleFilter
+from reviews.models import User
+from reviews.models import Category, Genre, Title, Review
 
 
 SUBJECT = 'YaMDb: код подверждения'
@@ -41,12 +43,15 @@ def signup(request):
     except IntegrityError as error:
         raise ValidationError(FIELD_ERROR.format(error))
     confirmation_code = default_token_generator.make_token(user)
-    send_mail(
-        SUBJECT,
-        MESSAGE.format(confirmation_code),
-        DEFAULT_FROM_EMAIL,
-        [user.email],
-    )
+    if user.last_login is None:
+        send_mail(
+            SUBJECT,
+            MESSAGE.format(confirmation_code),
+            DEFAULT_FROM_EMAIL,
+            [user.email],
+        )
+    else:
+        raise ValidationError('Такой пользователь уже существует')
     return Response(serializer.data, status=status.HTTP_200_OK)
 
 
@@ -63,6 +68,7 @@ def token(request):
             user,
             serializer.data['confirmation_code']):
         return Response(status=status.HTTP_400_BAD_REQUEST)
+    update_last_login(None, user)
     token = AccessToken.for_user(user)
     data = {
         'token': str(token),
@@ -73,7 +79,7 @@ def token(request):
 class UserViewSet(viewsets.ModelViewSet):
     queryset = User.objects.all()
     serializer_class = UserSerializer
-    permission_classes = (IsRoleAdmin,)
+    permission_classes = (IsRoleAdminOrStaff,)
     lookup_field = 'username'
 
     def perform_create(self, serializer):
@@ -102,7 +108,7 @@ class CreateListDestroyViewSet(mixins.CreateModelMixin,
                                mixins.DestroyModelMixin,
                                mixins.ListModelMixin,
                                viewsets.GenericViewSet):
-    permission_classes = (AdminOrReadOnly,)
+    permission_classes = [IsRoleAdminOrStaff | ReadOnly]
     lookup_field = 'slug'
     filter_backends = (filters.SearchFilter,)
     search_fields = ('name',)
@@ -121,7 +127,7 @@ class GenreViewSet(CreateListDestroyViewSet):
 class TitleViewSet(viewsets.ModelViewSet):
     queryset = Title.objects.annotate(rating=Avg('reviews__score'))
     ordering_fields = ('year', 'name')
-    permission_classes = (AdminOrReadOnly,)
+    permission_classes = [IsRoleAdminOrStaff | ReadOnly]
     filterset_class = TitleFilter
 
     def get_serializer_class(self):
@@ -137,14 +143,17 @@ class RecordViewSet(viewsets.ModelViewSet):
     record_name = None
 
     def get_base_record(self):
-        record = get_object_or_404(self.base_model, pk=self.kwargs.get(self.id_name))
+        record = get_object_or_404(
+            self.base_model, pk=self.kwargs.get(self.id_name)
+            )
         return record
 
     def perform_create(self, serializer):
-        print (serializer)
         kwargs = {
-            "author" : self.request.user,
-            self.record_name : get_object_or_404(self.base_model, pk=self.kwargs.get(self.id_name))
+            "author": self.request.user,
+            self.record_name: get_object_or_404(
+                self.base_model, pk=self.kwargs.get(self.id_name)
+            )
         }
         serializer.save(**kwargs)
 
@@ -154,7 +163,7 @@ class ReviewViewSet(RecordViewSet):
     base_model = Title
     id_name = "title_id"
     record_name = "title"
-    
+
     def get_queryset(self):
         title = self.get_base_record()
         return title.reviews.all()

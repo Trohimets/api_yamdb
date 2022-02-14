@@ -1,8 +1,8 @@
 from rest_framework import permissions
-from rest_framework.permissions import BasePermission
+from rest_framework.permissions import BasePermission, SAFE_METHODS
 
 
-class IsRoleAdmin(BasePermission):
+class IsRoleAdminOrStaff(BasePermission):
     message = 'Пользователь не является администратором!'
 
     def has_permission(self, request, view):
@@ -12,14 +12,9 @@ class IsRoleAdmin(BasePermission):
         )
 
 
-class AdminOrReadOnly(permissions.BasePermission):
-
+class ReadOnly(BasePermission):
     def has_permission(self, request, view):
-        user = request.user
-        return (
-            request.method in permissions.SAFE_METHODS
-            or user.is_authenticated and user.is_admin or user.is_superuser
-        )
+        return request.method in SAFE_METHODS
 
 
 class UserOrReadOnly(permissions.BasePermission):

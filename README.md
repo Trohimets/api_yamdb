@@ -57,6 +57,14 @@ pip install -r requirements.txt
 cd api_yamdb
 ```
 
+Заполненить базу данных CSV-файлами:
+
+```
+python manage.py uploadDB <CSV-файл>
+```
+
+Выполнить миграцию:
+
 ```
 python manage.py migrate
 ```
@@ -70,3 +78,18 @@ python manage.py runserver
 # Документация к API
 Документация к API доступна после запуска проекта по ссылке:
 http://127.0.0.1/redoc/
+
+# Используемые технологии
+- Python
+- Django REST framework
+- Git
+- SQLite3
+- Simple JWT
+
+# Разработчики
+
+[Скалозубов Максим](https://github.com/mmjax): управление пользователями (Auth и Users): система регистрации и аутентификации пользователей, пользовательские роли и права доступа, работа с токеном, система подтверждения через e-mail.
+
+[Трохимец Константин](https://github.com/Trohimets): категории (Categories), жанры (Genres) и произведения (Titles): модели, view и эндпойнты. Рейтинги произведений.
+
+[Дорошенко Виктор](https://github.com/Dorosh93): отзывы (Review) и комментарии (Comments): модели, view и эндпойнты.
