@@ -145,7 +145,7 @@ class RecordViewSet(viewsets.ModelViewSet):
     def get_base_record(self):
         record = get_object_or_404(
             self.base_model, pk=self.kwargs.get(self.id_name)
-            )
+        )
         return record
 
     def perform_create(self, serializer):
