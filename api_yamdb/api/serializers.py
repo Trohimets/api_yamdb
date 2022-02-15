@@ -1,5 +1,6 @@
 from django.shortcuts import get_object_or_404
 from rest_framework import serializers
+from django.core.validators import MinValueValidator, MaxValueValidator
 
 from reviews.models import Title, Genre, Category, Review, Comment
 from reviews.models import User
@@ -37,10 +38,6 @@ class SignupSerializer(serializers.Serializer):
         regex=r'^[\w.@+-]'
     )
 
-    class Meta:
-        model = User
-        fields = ('email', 'username',)
-
     def validate_username(self, value):
         if value == 'me':
             raise serializers.ValidationError(
@@ -56,10 +53,6 @@ class TokenSerializer(serializers.Serializer):
         regex=r'^[\w.@+-]'
     )
     confirmation_code = serializers.CharField(required=True)
-
-    class Meta:
-        model = User
-        fields = ('username', 'confirmation_code',)
 
 
 class GenreSerializer(serializers.ModelSerializer):
@@ -116,6 +109,12 @@ class ReviewSerializer(serializers.ModelSerializer):
     author = serializers.SlugRelatedField(
         read_only=True, slug_field='username'
     )
+    score = serializers.IntegerField(
+        validators=(
+            MinValueValidator(1),
+            MaxValueValidator(10)
+        )
+    )
 
     class Meta:
         model = Review
@@ -132,11 +131,6 @@ class ReviewSerializer(serializers.ModelSerializer):
                 'Можно оставить только один отзыв на произведение'
             )
         return data
-
-    def validate_score(self, score):
-        if score not in range(1, 11):
-            raise serializers.ValidationError('Укажите оценку от 1 до 10')
-        return score
 
 
 class CommentSerializer(serializers.ModelSerializer):

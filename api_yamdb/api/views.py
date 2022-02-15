@@ -1,9 +1,8 @@
 from django.contrib.auth.tokens import default_token_generator
 from django.core.mail import send_mail
-from django.contrib.auth.models import update_last_login
 from django.db import IntegrityError
-from django.shortcuts import get_object_or_404
 from django.db.models import Avg
+from django.shortcuts import get_object_or_404
 
 
 from rest_framework import status, viewsets, filters, mixins
@@ -14,7 +13,7 @@ from rest_framework.response import Response
 from rest_framework_simplejwt.tokens import AccessToken
 
 from .filters import TitleFilter
-from .permissions import IsRoleAdminOrStaff, AuthUserOrReadOnly, ReadOnly
+from .permissions import IsAdmin, AuthUserOrReadOnly, ReadOnly
 from .serializers import (CategorySerializer, GenreSerializer,
                           TitleGetSerializer, TitlePostSerializer,
                           ReviewSerializer, CommentSerializer, TokenSerializer,
@@ -37,21 +36,18 @@ def signup(request):
     user = serializer.validated_data.get('username')
     try:
         user, created = User.objects.get_or_create(
-            email=serializer.data['email'],
-            username=serializer.data['username'],
+            email=serializer.validated_data['email'],
+            username=serializer.validated_data['username'],
         )
     except IntegrityError as error:
         raise ValidationError(FIELD_ERROR.format(error))
     confirmation_code = default_token_generator.make_token(user)
-    if user.last_login is None:
-        send_mail(
-            SUBJECT,
-            MESSAGE.format(confirmation_code),
-            DEFAULT_FROM_EMAIL,
-            [user.email],
-        )
-    else:
-        raise ValidationError('Такой пользователь уже существует')
+    send_mail(
+        SUBJECT,
+        MESSAGE.format(confirmation_code),
+        DEFAULT_FROM_EMAIL,
+        [user.email],
+    )
     return Response(serializer.data, status=status.HTTP_200_OK)
 
 
@@ -62,13 +58,12 @@ def token(request):
     serializer.is_valid(raise_exception=True)
     user = get_object_or_404(
         User,
-        username=serializer.data['username'],
+        username=serializer.validated_data['username'],
     )
     if not default_token_generator.check_token(
             user,
             serializer.data['confirmation_code']):
         return Response(status=status.HTTP_400_BAD_REQUEST)
-    update_last_login(None, user)
     token = AccessToken.for_user(user)
     data = {
         'token': str(token),
@@ -79,11 +74,8 @@ def token(request):
 class UserViewSet(viewsets.ModelViewSet):
     queryset = User.objects.all()
     serializer_class = UserSerializer
-    permission_classes = (IsRoleAdminOrStaff,)
+    permission_classes = (IsAdmin,)
     lookup_field = 'username'
-
-    def perform_create(self, serializer):
-        serializer.save()
 
     @action(
         methods=['get', 'patch'],
@@ -108,7 +100,7 @@ class CreateListDestroyViewSet(mixins.CreateModelMixin,
                                mixins.DestroyModelMixin,
                                mixins.ListModelMixin,
                                viewsets.GenericViewSet):
-    permission_classes = [IsRoleAdminOrStaff | ReadOnly]
+    permission_classes = [IsAdmin | ReadOnly]
     lookup_field = 'slug'
     filter_backends = (filters.SearchFilter,)
     search_fields = ('name',)
@@ -127,7 +119,7 @@ class GenreViewSet(CreateListDestroyViewSet):
 class TitleViewSet(viewsets.ModelViewSet):
     queryset = Title.objects.annotate(rating=Avg('reviews__score'))
     ordering_fields = ('year', 'name')
-    permission_classes = [IsRoleAdminOrStaff | ReadOnly]
+    permission_classes = [IsAdmin | ReadOnly]
     filterset_class = TitleFilter
 
     def get_serializer_class(self):

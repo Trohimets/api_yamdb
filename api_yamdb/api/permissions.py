@@ -2,13 +2,13 @@ from rest_framework import permissions
 from rest_framework.permissions import BasePermission, SAFE_METHODS
 
 
-class IsRoleAdminOrStaff(BasePermission):
+class IsAdmin(BasePermission):
     message = 'Пользователь не является администратором!'
 
     def has_permission(self, request, view):
         user = request.user
         return (
-            user.is_authenticated and user.is_admin or user.is_superuser
+            user.is_authenticated and user.is_admin
         )
 
 
@@ -30,6 +30,7 @@ class AuthUserOrReadOnly(permissions.BasePermission):
             return True
         user = request.user
         return (
-            user.is_authenticated and (obj.author == user
-            or user.is_admin or user.is_moderator)
+            user.is_authenticated and (
+                obj.author == user or user.is_admin or user.is_moderator
+            )
         )
