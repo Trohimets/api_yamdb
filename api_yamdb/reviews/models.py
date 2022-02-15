@@ -1,6 +1,5 @@
 import datetime as dt
 from django.contrib.auth.models import AbstractUser
-from django.db import models
 from django.core.validators import MinValueValidator, MaxValueValidator
 from django.db import models
 
@@ -8,18 +7,13 @@ from django.db import models
 USER = "user"
 MODERATOR = "moderator"
 ADMIN = "admin"
-ROLES = [
-    ("user", USER),
-    ("moderator", MODERATOR),
-    ("admin", ADMIN)
-]
-year = dt.date.today().year
-
 ROLES = {
     "user": USER,
     "moderator": MODERATOR,
     "admin": ADMIN
 }
+
+year = dt.date.today().year
 
 
 class User(AbstractUser):
@@ -43,8 +37,8 @@ class User(AbstractUser):
         blank=True,
     )
     role = models.CharField(
-        max_length=max(ROLES, key=len),
-        choices=ROLES,
+        max_length=len(max(ROLES, key=len)),
+        choices=ROLES.items(),
         default=USER
     )
 
