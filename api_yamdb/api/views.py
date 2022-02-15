@@ -25,7 +25,7 @@ from reviews.models import Category, Genre, Title, Review
 
 SUBJECT = 'YaMDb: код подверждения'
 MESSAGE = 'Ваш код подтверждения - {}'
-FIELD_ERROR = 'Неуникальное поле. Ошибка - {}'
+FIELD_ERROR = 'Неуникальное поле. Пользователь с таким {} уже существует'
 
 
 @api_view(['POST'])
@@ -33,14 +33,13 @@ FIELD_ERROR = 'Неуникальное поле. Ошибка - {}'
 def signup(request):
     serializer = SignupSerializer(data=request.data)
     serializer.is_valid(raise_exception=True)
-    user = serializer.validated_data.get('username')
     try:
         user, created = User.objects.get_or_create(
             email=serializer.validated_data['email'],
             username=serializer.validated_data['username'],
         )
     except IntegrityError as error:
-        raise ValidationError(FIELD_ERROR.format(error))
+        raise ValidationError(FIELD_ERROR.format(f'{error}'.partition('.')[2]))
     confirmation_code = default_token_generator.make_token(user)
     send_mail(
         SUBJECT,
@@ -62,7 +61,7 @@ def token(request):
     )
     if not default_token_generator.check_token(
             user,
-            serializer.data['confirmation_code']):
+            serializer.validated_data['confirmation_code']):
         return Response(status=status.HTTP_400_BAD_REQUEST)
     token = AccessToken.for_user(user)
     data = {
