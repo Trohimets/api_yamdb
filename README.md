@@ -57,16 +57,16 @@ pip install -r requirements.txt
 cd api_yamdb
 ```
 
-Заполненить базу данных CSV-файлами:
-
-```
-python manage.py uploadDB <CSV-файл>
-```
-
 Выполнить миграцию:
 
 ```
 python manage.py migrate
+```
+
+Заполненить базу данных CSV-файлами:
+
+```
+python manage.py uploadDB users.csv category.csv genre.csv titles.csv review.csv comments.csv
 ```
 
 Запустить проект:
