@@ -8,11 +8,11 @@ from django.db import models
 USER = "user"
 MODERATOR = "moderator"
 ADMIN = "admin"
-ROLES = [
-    ("user", USER),
-    ("moderator", MODERATOR),
-    ("admin", ADMIN)
-]
+ROLES = {
+    "user": USER,
+    "moderator": MODERATOR,
+    "admin": ADMIN
+}
 
 
 def validate_year(value):
@@ -43,14 +43,14 @@ class User(AbstractUser):
         blank=True,
     )
     role = models.CharField(
-        max_length=100,
+        max_length=max(ROLES, key=len),
         choices=ROLES,
         default=USER
     )
 
     @property
     def is_admin(self):
-        return self.is_superuser or self.role == ADMIN
+        return self.is_superuser or self.is_staff or self.role == ADMIN
 
     @property
     def is_moderator(self):
