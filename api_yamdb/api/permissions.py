@@ -17,7 +17,7 @@ class ReadOnly(BasePermission):
         return request.method in SAFE_METHODS
 
 
-class UserOrReadOnly(permissions.BasePermission):
+class AuthUserOrReadOnly(permissions.BasePermission):
 
     def has_permission(self, request, view):
         if request.method in permissions.SAFE_METHODS:
@@ -30,6 +30,6 @@ class UserOrReadOnly(permissions.BasePermission):
             return True
         user = request.user
         return (
-            (user.is_authenticated and (obj.author == user))
-            or user.is_admin or user.is_moderator
+            user.is_authenticated and (obj.author == user
+            or user.is_admin or user.is_moderator)
         )

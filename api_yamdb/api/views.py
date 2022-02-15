@@ -14,7 +14,7 @@ from rest_framework.response import Response
 from rest_framework_simplejwt.tokens import AccessToken
 
 from .filters import TitleFilter
-from .permissions import IsRoleAdminOrStaff, UserOrReadOnly, ReadOnly
+from .permissions import IsRoleAdminOrStaff, AuthUserOrReadOnly, ReadOnly
 from .serializers import (CategorySerializer, GenreSerializer,
                           TitleGetSerializer, TitlePostSerializer,
                           ReviewSerializer, CommentSerializer, TokenSerializer,
@@ -137,25 +137,24 @@ class TitleViewSet(viewsets.ModelViewSet):
 
 
 class RecordViewSet(viewsets.ModelViewSet):
-    permission_classes = (UserOrReadOnly,)
+    permission_classes = (AuthUserOrReadOnly,)
     base_model = None
     id_name = None
     record_name = None
 
     def get_base_record(self):
-        record = get_object_or_404(
+        return get_object_or_404(
             self.base_model, pk=self.kwargs.get(self.id_name)
         )
-        return record
 
     def perform_create(self, serializer):
-        kwargs = {
-            "author": self.request.user,
-            self.record_name: get_object_or_404(
+        serializer.save(
+            author=self.request.user,
+            **{self.record_name: get_object_or_404(
                 self.base_model, pk=self.kwargs.get(self.id_name)
             )
-        }
-        serializer.save(**kwargs)
+            }
+        )
 
 
 class ReviewViewSet(RecordViewSet):
@@ -165,8 +164,7 @@ class ReviewViewSet(RecordViewSet):
     record_name = "title"
 
     def get_queryset(self):
-        title = self.get_base_record()
-        return title.reviews.all()
+        return self.get_base_record().reviews.all()
 
 
 class CommentViewSet(RecordViewSet):
@@ -176,5 +174,4 @@ class CommentViewSet(RecordViewSet):
     record_name = "review"
 
     def get_queryset(self):
-        review = self.get_base_record()
-        return review.comments.all()
+        return self.get_base_record().comments.all()

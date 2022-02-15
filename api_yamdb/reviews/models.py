@@ -155,6 +155,7 @@ class Review(models.Model):
     )
 
     class Meta:
+        ordering = ['id']
         constraints = [
             models.UniqueConstraint(
                 fields=['author', 'title'],
@@ -190,3 +191,6 @@ class Comment(models.Model):
         auto_now_add=True,
         help_text='Дата публикации комментария'
     )
+
+    class Meta:
+        ordering = ['id']

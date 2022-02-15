@@ -122,15 +122,21 @@ class ReviewSerializer(serializers.ModelSerializer):
         fields = ('id', 'author', 'text', 'score', 'pub_date')
 
     def validate(self, data):
-        if self.context['request'].method == 'POST':
-            title_id = self.context['view'].kwargs.get('title_id')
-            title = get_object_or_404(Title, pk=title_id)
-            user = self.context['request'].user
-            if Review.objects.filter(title=title, author=user).exists():
-                raise serializers.ValidationError(
-                    'Можно оставить только один отзыв на произведение'
-                )
+        if self.context['request'].method != 'POST':
+            return data
+        title_id = self.context['view'].kwargs.get('title_id')
+        title = get_object_or_404(Title, pk=title_id)
+        user = self.context['request'].user
+        if Review.objects.filter(title=title, author=user).exists():
+            raise serializers.ValidationError(
+                'Можно оставить только один отзыв на произведение'
+            )
         return data
+
+    def validate_score(self, score):
+        if score not in range(1, 11):
+            raise serializers.ValidationError('Укажите оценку от 1 до 10')
+        return score
 
 
 class CommentSerializer(serializers.ModelSerializer):
