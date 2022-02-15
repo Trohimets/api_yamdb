@@ -1,7 +1,6 @@
 import datetime as dt
 from django.contrib.auth.models import AbstractUser
 from django.db import models
-from django.core.exceptions import ValidationError
 from django.core.validators import MinValueValidator, MaxValueValidator
 
 
@@ -13,13 +12,7 @@ ROLES = [
     ("moderator", MODERATOR),
     ("admin", ADMIN)
 ]
-
-
-def validate_year(value):
-    year = dt.date.today().year
-    if value > year:
-        raise ValidationError('Проверьте указанный год')
-    return value
+year = dt.date.today().year
 
 
 class User(AbstractUser):
@@ -72,6 +65,9 @@ class Category(models.Model):
         unique=True
     )
 
+    class Meta:
+        ordering = ['id']
+
     def __str__(self):
         return self.name
 
@@ -83,8 +79,12 @@ class Genre(models.Model):
     )
     slug = models.SlugField(
         verbose_name='Идентификатор',
+        max_length=50,
         unique=True
     )
+
+    class Meta:
+        ordering = ['id']
 
     def __str__(self):
         return self.name
@@ -110,9 +110,12 @@ class Title(models.Model):
         help_text='Выберите жанр'
     )
     year = models.IntegerField(
-        validators=[validate_year],
+        validators=[MaxValueValidator(year)],
         verbose_name='Год'
     )
+
+    class Meta:
+        ordering = ['id']
 
     def __str__(self):
         return self.name
