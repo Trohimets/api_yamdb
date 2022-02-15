@@ -2,6 +2,7 @@ import datetime as dt
 from django.contrib.auth.models import AbstractUser
 from django.db import models
 from django.core.validators import MinValueValidator, MaxValueValidator
+from django.db import models
 
 
 USER = "user"
@@ -13,6 +14,12 @@ ROLES = [
     ("admin", ADMIN)
 ]
 year = dt.date.today().year
+
+ROLES = {
+    "user": USER,
+    "moderator": MODERATOR,
+    "admin": ADMIN
+}
 
 
 class User(AbstractUser):
@@ -36,14 +43,14 @@ class User(AbstractUser):
         blank=True,
     )
     role = models.CharField(
-        max_length=100,
+        max_length=max(ROLES, key=len),
         choices=ROLES,
         default=USER
     )
 
     @property
     def is_admin(self):
-        return self.is_superuser or self.role == ADMIN
+        return self.is_superuser or self.is_staff or self.role == ADMIN
 
     @property
     def is_moderator(self):
@@ -158,6 +165,7 @@ class Review(models.Model):
     )
 
     class Meta:
+        ordering = ['id']
         constraints = [
             models.UniqueConstraint(
                 fields=['author', 'title'],
@@ -193,3 +201,6 @@ class Comment(models.Model):
         auto_now_add=True,
         help_text='Дата публикации комментария'
     )
+
+    class Meta:
+        ordering = ['id']
