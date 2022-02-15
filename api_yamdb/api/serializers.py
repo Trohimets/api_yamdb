@@ -1,13 +1,13 @@
 import datetime as dt
 from django.shortcuts import get_object_or_404
-from django.core.validators import MaxValueValidator
-from rest_framework import serializers
 from django.core.validators import MinValueValidator, MaxValueValidator
+from rest_framework import serializers
 
 from reviews.models import Title, Genre, Category, Review, Comment
 from reviews.models import User
 
 year = dt.date.today().year
+
 
 class UserSerializer(serializers.ModelSerializer):
 
