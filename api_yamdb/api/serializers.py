@@ -1,10 +1,13 @@
+import datetime as dt
 from django.shortcuts import get_object_or_404
+from django.core.validators import MaxValueValidator
 from rest_framework import serializers
 from django.core.validators import MinValueValidator, MaxValueValidator
 
 from reviews.models import Title, Genre, Category, Review, Comment
 from reviews.models import User
 
+year = dt.date.today().year
 
 class UserSerializer(serializers.ModelSerializer):
 
@@ -84,8 +87,7 @@ class TitleGetSerializer(serializers.ModelSerializer):
         model = Title
         fields = ('id', 'name', 'description', 'category',
                   'genre', 'year', 'rating')
-        read_only_fields = ('id', 'name', 'description', 'category',
-                            'genre', 'year', 'rating')
+        read_only_fields = ('__all__',)
 
 
 class TitlePostSerializer(serializers.ModelSerializer):
@@ -98,6 +100,7 @@ class TitlePostSerializer(serializers.ModelSerializer):
         queryset=Genre.objects.all(),
         slug_field='slug'
     )
+    year = serializers.IntegerField(validators=[MaxValueValidator(year)])
 
     class Meta:
         model = Title
