@@ -13,8 +13,6 @@ ROLES = [
     ("admin", ADMIN)
 ]
 
-year = dt.date.today().year
-
 
 class User(AbstractUser):
     username = models.CharField(
@@ -67,7 +65,7 @@ class Category(models.Model):
     )
 
     class Meta:
-        ordering = ['id']
+        ordering = ['name']
 
     def __str__(self):
         return self.name
@@ -85,7 +83,7 @@ class Genre(models.Model):
     )
 
     class Meta:
-        ordering = ['id']
+        ordering = ['name']
 
     def __str__(self):
         return self.name
@@ -111,12 +109,12 @@ class Title(models.Model):
         help_text='Выберите жанр'
     )
     year = models.IntegerField(
-        validators=[MaxValueValidator(year)],
+        validators=[MaxValueValidator(dt.date.today().year)],
         verbose_name='Год'
     )
 
     class Meta:
-        ordering = ['id']
+        ordering = ['name']
 
     def __str__(self):
         return self.name

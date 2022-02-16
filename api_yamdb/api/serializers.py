@@ -6,8 +6,6 @@ from rest_framework import serializers
 from reviews.models import Title, Genre, Category, Review, Comment
 from reviews.models import User
 
-year = dt.date.today().year
-
 
 class UserSerializer(serializers.ModelSerializer):
 
@@ -97,7 +95,9 @@ class TitlePostSerializer(serializers.ModelSerializer):
         queryset=Genre.objects.all(),
         slug_field='slug'
     )
-    year = serializers.IntegerField(validators=[MaxValueValidator(year)])
+    year = serializers.IntegerField(
+        validators=[MaxValueValidator(dt.date.today().year)]
+    )
 
     class Meta:
         model = Title
