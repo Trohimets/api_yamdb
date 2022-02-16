@@ -104,6 +104,12 @@ class TitlePostSerializer(serializers.ModelSerializer):
         fields = ('id', 'name', 'description', 'category',
                   'genre', 'year')
 
+    def validate_year(self, value):
+        year = dt.date.today().year
+        if value > year:
+            raise serializers.ValidationError('Проверьте указанный год')
+        return value
+
 
 class ReviewSerializer(serializers.ModelSerializer):
     author = serializers.SlugRelatedField(
