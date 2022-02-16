@@ -13,7 +13,7 @@ from rest_framework.response import Response
 from rest_framework_simplejwt.tokens import AccessToken
 
 from .filters import TitleFilter
-from .permissions import IsAdmin, AuthUserOrReadOnly, ReadOnly
+from .permissions import IsAdmin, AuthorAdminModeratorOrReadOnly, ReadOnly
 from .serializers import (CategorySerializer, GenreSerializer,
                           TitleGetSerializer, TitlePostSerializer,
                           ReviewSerializer, CommentSerializer, TokenSerializer,
@@ -129,7 +129,7 @@ class TitleViewSet(viewsets.ModelViewSet):
 
 
 class RecordViewSet(viewsets.ModelViewSet):
-    permission_classes = (AuthUserOrReadOnly,)
+    permission_classes = (AuthorAdminModeratorOrReadOnly,)
     base_model = None
     id_name = None
     record_name = None
