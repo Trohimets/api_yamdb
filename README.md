@@ -1,3 +1,5 @@
+<img src="icon.png" align="right" />
+
 # Описание проекта YaMDb
 Проект YaMDb собирает отзывы пользователей на произведения. Произведения делятся на категории: «Книги», «Фильмы», «Музыка».
 Список категорий может быть расширен администратором.
@@ -93,3 +95,8 @@ http://127.0.0.1/redoc/
 [Трохимец Константин](https://github.com/Trohimets): категории (Categories), жанры (Genres) и произведения (Titles): модели, view и эндпойнты. Рейтинги произведений.
 
 [Дорошенко Виктор](https://github.com/Dorosh93): отзывы (Review) и комментарии (Comments): модели, view и эндпойнты.
+
+![Python](https://img.shields.io/badge/python-3670A0?style=for-the-badge&logo=python&logoColor=ffdd54)
+![DjangoREST](https://img.shields.io/badge/DJANGO-REST-ff1709?style=for-the-badge&logo=django&logoColor=white&color=ff1709&labelColor=gray)
+![SQLite](https://img.shields.io/badge/sqlite-%2307405e.svg?style=for-the-badge&logo=sqlite&logoColor=white)
+![GitHub](https://img.shields.io/badge/github-%23121011.svg?style=for-the-badge&logo=github&logoColor=white)
